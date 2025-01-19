@@ -43,6 +43,15 @@ export class DatabaseMemoryPostgres{
         return await sql`SELECT * FROM INGREDIENTS WHERE "name" = ${ingredientName}`
     }
 
+    async getIngredientByRecipeId(id_recipe){
+        return await sql`
+            SELECT ri.*, i.*
+            FROM RECIPE_INGREDIENTS ri
+            INNER JOIN INGREDIENTS i ON i.id_ingredient = ri.id_ingredient
+            WHERE ri.id_recipe = ${id_recipe}
+        `
+    }
+
     async addIngredient(ingredientName){
         return await sql`INSERT INTO INGREDIENTS ("name") VALUES (${ingredientName}) RETURNING id_ingredient`
     }
@@ -60,6 +69,15 @@ export class DatabaseMemoryPostgres{
         `
     }
 
+    async getRecipeByIngredient(ingredient){
+        return await sql`
+            SELECT r."id_recipe", "title", "image", "calories", "prepTime" 
+            FROM RECIPES r
+            INNER JOIN RECIPE_INGREDIENTS ri ON r.id_recipe = ri.id_recipe
+            INNER JOIN INGREDIENTS i ON i.id_ingredient = ri.id_ingredient AND i.name = ${ingredient}
+        `
+    }
+
     async addRecipe(recipe){
         const {title, image, description, ingredients, steps, calories, prepTime} = recipe
         const recipeId = Array.from(await sql`
@@ -69,7 +87,8 @@ export class DatabaseMemoryPostgres{
         
         ingredients.map(async (ingredient) =>{
             const {nome, unidade_de_medida, qtd} = ingredient
-            let ingredientId = Array.from(await this.getIngredientByName(nome))[0]
+            let ingredientId = Array.from(await this.getIngredientByName(nome))[0]?.id_ingredient
+            console.log(ingredientId)
             
             if(!ingredientId){
                 ingredientId = Array.from(await this.addIngredient(nome))[0].id_ingredient
@@ -79,14 +98,7 @@ export class DatabaseMemoryPostgres{
         })
     }
 
-    async getIngredientByRecipeId(id_recipe){
-        return await sql`
-            SELECT ri.*, i.*
-            FROM RECIPE_INGREDIENTS ri
-            INNER JOIN INGREDIENTS i ON i.id_ingredient = ri.id_ingredient
-            WHERE ri.id_recipe = ${id_recipe}
-        `
-    }
+    
 
     // update(id, video){
     // }

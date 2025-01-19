@@ -55,9 +55,27 @@ server.post('/usuarios/login', async (request, reply) =>{
     return reply.status(401).send({ error: 'Email ou senha inválidos' });
 })
 
-server.get('/recipes', async (request, reply) => {
-    const recipes = await database.listRecipes()
-    return recipes
+server.post('/recipes/search', async (request, reply) => {
+    let recipes = []
+    
+    const ingredients = request.body?.ingredients
+    if(ingredients){
+        for(const ingredient of ingredients){
+            const result = Array.from(await database.getRecipeByIngredient(ingredient))
+            recipes.push(...result)
+        }
+
+        recipes = recipes.filter((value, index, self) =>
+            index === self.findIndex((t) => (
+              t.id_recipe === value.id_recipe
+            ))
+          )
+    }else{
+        recipes = await database.listRecipes()
+    }
+    // console.log(recipes)
+
+    return reply.status(200).send(recipes);
 })
 
 server.post('/recipes/:id_recipe', async (request, reply) => {

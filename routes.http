@@ -24,7 +24,19 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3333/recipes
+POST http://localhost:3333/recipes/search
+
+
+###
+
+POST http://localhost:3333/recipes/search
+Content-Type: application/json
+
+{
+    "ingredients": [
+        "aveia"
+    ]
+}
 
 ###
 
@@ -32,7 +44,7 @@ POST http://localhost:3333/recipes
 Content-Type: application/json
 
 {
-    "title": "Mingau de Aveia Proteico", 
+    "title": "Mingau de Aveia Proteico 3", 
     "image": "https://guiadacozinha.com.br/wp-content/uploads/2023/02/mingau-de-aveia-proteico-768x619.jpg", 
     "description": "Delicioso mingau de aveia proteico...", 
     "ingredients": [
@@ -47,7 +59,7 @@ Content-Type: application/json
             "qtd": 2
         },
         {
-            "nome": "mel",
+            "nome": "salada",
             "unidade_de_medida": "Colher de sopa",
             "qtd": 1
         }
