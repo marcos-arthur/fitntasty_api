@@ -60,28 +60,47 @@ server.get('/usuarios', async (request, reply) => {
     return usuarios
 })
 
-server.post('/usuarios/login', async (request, reply) => {
-    console.log('Login request received:', request.body);
-  
-    const { email, password } = request.body;
-    const usuario = await database.getUser({ email, password });
-  
+server.post('/usuarios/login', async (request, reply) =>{
+    const {email, password} = request.body
+
+    
+    const usuario = await database.getUser({email, password})
+
     if (usuario) {
-      return reply.status(200).send(usuario);
+        return reply.status(200).send(usuario);
     }
-  
+
     return reply.status(401).send({ error: 'Email ou senha inválidos' });
-  });
-  
-server.put('/videos/:id', async (request, reply) => {
-    const videoId = request.params.id
-    const {title, description, duration} = request.body
+})
 
+server.get('/recipes', async (request, reply) => {
+    const recipes = await database.listRecipes()
+    return recipes
+})
 
-    await database.update(videoId, {
+server.post('/recipes/:id_recipe', async (request, reply) => {
+    const recipe = Array.from(await database.getRecipeById(request.params.id_recipe))[0]
+    
+    if(recipe){
+        const ingredients = Array.from(await database.getIngredientByRecipeId(recipe.id_recipe))
+        recipe.ingredients = ingredients
+    }
+
+    return recipe
+})
+
+server.post('/recipes', async(request, reply) => {
+    const {title, image, description, ingredients, steps, calories, prepTime} = request.body
+    // console.log(request.body)
+
+    await database.addRecipe({
         title, 
+        image, 
         description, 
-        duration
+        ingredients, 
+        steps, 
+        calories, 
+        prepTime
     })
 
 

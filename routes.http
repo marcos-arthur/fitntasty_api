@@ -1,10 +1,14 @@
+GET http://localhost:3333/usuarios
+
+###
+
 POST http://localhost:3333/usuarios
 Content-Type: application/json
 
 {
-    "firstName": "marcos", 
-    "lastName": "arthur", 
-    "email": "ma1@email.com", 
+    "firstName": "silva", 
+    "lastName": "melo", 
+    "email": "ma2@email.com", 
     "password": "123"
 }
 
@@ -20,15 +24,51 @@ Content-Type: application/json
 
 ###
 
-PUT http://localhost:3333/videos/dc10ccef-61f9-4949-a986-3bdb5e6f227e
+GET http://localhost:3333/recipes
+
+###
+
+POST http://localhost:3333/recipes
 Content-Type: application/json
 
 {
-    "title": "Video 02",
-    "description": "Esse é o vídeo 01",
-    "duration": 100
+    "title": "Mingau de Aveia Proteico", 
+    "image": "https://guiadacozinha.com.br/wp-content/uploads/2023/02/mingau-de-aveia-proteico-768x619.jpg", 
+    "description": "Delicioso mingau de aveia proteico...", 
+    "ingredients": [
+        {
+            "nome": "aveia",
+            "unidade_de_medida": "Xícara",
+            "qtd": 1
+        },
+        {
+            "nome": "leite",
+            "unidade_de_medida": "Xícara",
+            "qtd": 2
+        },
+        {
+            "nome": "mel",
+            "unidade_de_medida": "Colher de sopa",
+            "qtd": 1
+        }
+    ], 
+    "steps": "Misture todos os ingredientes em uma panela... - Cozinhe em fogo médio até engrossar...", 
+    "calories": "250", 
+    "prepTime": "10"
 }
 
 ###
 
-DELETE http://localhost:3333/videos/b065aaf3-e7af-446e-8af0-d90e4e71f8a4
+POST http://localhost:3333/recipes/12
+
+###
+
+GET http://localhost:3333/ingredients
+
+###
+
+POST http://localhost:3333/ingredients/mel
+
+###
+
+POST http://localhost:3333/ingredients/add/Amendoim

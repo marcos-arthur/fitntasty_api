@@ -56,11 +56,67 @@ export class DatabaseMemoryPostgres{
             )
         `;
     }
+
+    async listIngredients(){
+        return await sql`SELECT * FROM INGREDIENTS`
+    }
+
+    async getIngredientByName(ingredientName){
+        return await sql`SELECT * FROM INGREDIENTS WHERE "name" = ${ingredientName}`
+    }
+
+    async addIngredient(ingredientName){
+        return await sql`INSERT INTO INGREDIENTS ("name") VALUES (${ingredientName}) RETURNING id_ingredient`
+    }
+
+    async listRecipes(){
+        return await sql`
+            SELECT "id_recipe", "title", "image", "calories", "prepTime" FROM RECIPES
+        `
+    }
+
+    async getRecipeById(id_recipe){
+        return await sql`
+            SELECT "id_recipe", "title", "image", "calories", "prepTime" FROM RECIPES
+            WHERE "id_recipe" = ${id_recipe}
+        `
+    }
+
+    async addRecipe(recipe){
+        const {title, image, description, ingredients, steps, calories, prepTime} = recipe
+        const recipeId = Array.from(await sql`
+            INSERT INTO RECIPES ("title", "image", "description", "steps", "calories", "prepTime", "id_usuario") 
+            VALUES (${title}, ${image}, ${description}, ${steps}, ${calories}, ${prepTime}, 2) 
+            RETURNING id_recipe`)[0].id_recipe
+        
+        ingredients.map(async (ingredient) =>{
+            const {nome, unidade_de_medida, qtd} = ingredient
+            let ingredientId = Array.from(await this.getIngredientByName(nome))[0]
+            
+            if(!ingredientId){
+                ingredientId = Array.from(await this.addIngredient(nome))[0].id_ingredient
+            }
+            
+            await sql`INSERT INTO RECIPE_INGREDIENTS ("id_recipe", "id_ingredient", "quantity", "measure_unity") VALUES (${recipeId}, ${ingredientId}, ${qtd}, ${unidade_de_medida})`
+        })
+    }
+
+    async getIngredientByRecipeId(id_recipe){
+        return await sql`
+            SELECT ri.*, i.*
+            FROM RECIPE_INGREDIENTS ri
+            INNER JOIN INGREDIENTS i ON i.id_ingredient = ri.id_ingredient
+            WHERE ri.id_recipe = ${id_recipe}
+        `
+    }
+
+    // update(id, video){
+    // }
     
     
     update(id, video){
     }
 
-    delete(id){
-    }
+    // delete(id){
+    // }
 }
