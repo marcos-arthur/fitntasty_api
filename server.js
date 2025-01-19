@@ -17,8 +17,6 @@ const server = fastify()
 
 server.post('/usuarios', async (request, reply) => {
     const {firstName, lastName, email, password} = request.body
-    
-    console.log(request.body)
 
     await database.createUser({
         firstName, 
@@ -47,27 +45,49 @@ server.post('/usuarios/login', async (request, reply) =>{
     return usuario
 })
 
-server.put('/videos/:id', async (request, reply) => {
-    const videoId = request.params.id
-    const {title, description, duration} = request.body
-
-
-    await database.update(videoId, {
-        title, 
-        description, 
-        duration
-    })
-
-
-    return reply.status(204).send()
+server.get('/recipes', async (request, reply) => {
+    const recipes = await database.listRecipes()
+    return recipes
 })
 
-server.delete('/videos/:id', async (request, reply) => {
-    const videoId = request.params.id
+server.post('/recipes/:id_recipe', async (request, reply) => {
+    const recipe = Array.from(await database.getRecipeById(request.params.id_recipe))[0]
     
-    await database.delete(videoId)
+    if(recipe){
+        const ingredients = Array.from(await database.getIngredientByRecipeId(recipe.id_recipe))
+        recipe.ingredients = ingredients
+    }
 
-    return reply.status(204).send()
+    return recipe
+})
+
+server.post('/recipes', async(request, reply) => {
+    const {title, image, description, ingredients, steps, calories, prepTime} = request.body
+    // console.log(request.body)
+
+    await database.addRecipe({
+        title, 
+        image, 
+        description, 
+        ingredients, 
+        steps, 
+        calories, 
+        prepTime
+    })
+
+    return reply.status(201).send()
+})
+
+server.get('/ingredients', async (request, reply) => {
+    return await database.listIngredients()
+})
+
+server.post('/ingredients/:name', async (request, reply) => {
+    return await database.getIngredientByName(request.params.name)
+})
+
+server.post('/ingredients/add/:name', async (request, reply) => {
+    return await database.addIngredient(request.params.name)
 })
 
 server.listen({

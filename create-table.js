@@ -44,6 +44,7 @@ sql`
                     CREATE TABLE "recipe_ingredients" (
                     "id_recipe" integer NOT NULL REFERENCES "recipes"("id_recipe"),
                     "id_ingredient" integer NOT NULL REFERENCES "ingredients"("id_ingredient"),
+                    "measure_unity" varchar(50) NOT NULL,
                     "quantity" varchar(50) NOT NULL
                     );
                 `
