@@ -9,13 +9,19 @@
 // server.listen(3333)
 
 import {fastify} from "fastify";
+import fastifyCors from '@fastify/cors';
 import { DatabaseMemoryPostgres } from "./database-postgres.js";
 
 const database = new DatabaseMemoryPostgres()
-
 const server = fastify()
 
+server.register(fastifyCors, {
+    origin: "*", 
+});
+
 server.post('/usuarios', async (request, reply) => {
+    reply.header("Access-Control-Allow-Origin", "*");
+    reply.header("Access-Control-Allow-Methods", "POST");
     const {firstName, lastName, email, password} = request.body
 
     await database.createUser({
@@ -42,7 +48,11 @@ server.post('/usuarios/login', async (request, reply) =>{
     
     const usuario = await database.getUser({email, password})
 
-    return usuario
+    if (usuario) {
+        return reply.status(200).send(usuario);
+    }
+
+    return reply.status(401).send({ error: 'Email ou senha inválidos' });
 })
 
 server.get('/recipes', async (request, reply) => {
@@ -91,5 +101,11 @@ server.post('/ingredients/add/:name', async (request, reply) => {
 })
 
 server.listen({
-    port: 3333,
-})
+  port: 3333,
+}, (err, address) => {
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  console.log(`Server is running on ${address}`);
+});

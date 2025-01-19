@@ -2,20 +2,21 @@ import { randomUUID } from "crypto"
 import { sql } from "./db.js"
 
 export class DatabaseMemoryPostgres{
-    async getUser(userData){
-        const {email, password} = userData
-        console.log(userData)
-
+    async getUser(userData) {
+        const { email, password } = userData;
+        console.log(userData);
+    
         const user = await sql`
-            SELECT "id_usuario", "email", "firstName", "lastName", "id_tipousuario" FROM USUARIO 
-            WHERE "email" = ${email}
-            AND "password" = ${password}
-        `.catch(error =>{
-            console.log(error)
-        })
-
-        return user
+            SELECT "id_usuario", "email", "firstName", "lastName", "id_tipousuario"
+            FROM "usuario"
+            WHERE "email" = ${email} AND "password" = ${password}
+        `.catch(error => {
+            console.error(error);
+        });
+    
+        return user?.[0] || null; // Retorna apenas o primeiro usuário ou null
     }
+    
 
     async listUser(search){
         let users
