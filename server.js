@@ -60,6 +60,12 @@ server.get('/usuarios', async (request, reply) => {
     return usuarios
 })
 
+server.get('/nutricionists', async (request, reply) => {
+    const nutricionists = await database.listNutricionists()
+
+    return nutricionists
+})
+
 server.post('/usuarios/login', async (request, reply) =>{
     const {email, password} = request.body
 

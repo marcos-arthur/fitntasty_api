@@ -30,6 +30,22 @@ export class DatabaseMemoryPostgres{
         return users
     }
 
+    async listNutricionists(search){
+        let users
+
+        if(search){
+            users = await sql`
+                SELECT "id_usuario", "email", "firstName", "lastName", "id_tipousuario", "crn", "photoUrl", "phone"
+                FROM USUARIO WHERE crn IS NOT NULL AND "firstName" ILIKE "%${search}%"`
+        } else{
+            users = await sql`
+                SELECT "id_usuario", "email", "firstName", "lastName", "id_tipousuario", "crn", "photoUrl", "phone"
+                FROM USUARIO WHERE "crn" IS NOT NULL`
+        }
+
+        return users
+    }
+
     async createUser(user) {
         const { firstName, lastName, email, password, isNutritionist, crn, photoUrl, phone } = user;
     
