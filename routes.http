@@ -1,0 +1,34 @@
+POST http://localhost:3333/usuarios
+Content-Type: application/json
+
+{
+    "firstName": "marcos", 
+    "lastName": "arthur", 
+    "email": "ma1@email.com", 
+    "password": "123"
+}
+
+###
+
+POST http://localhost:3333/usuarios/login
+Content-Type: application/json
+
+{
+    "email": "ma1@email.com", 
+    "password": "123"
+}
+
+###
+
+PUT http://localhost:3333/videos/dc10ccef-61f9-4949-a986-3bdb5e6f227e
+Content-Type: application/json
+
+{
+    "title": "Video 02",
+    "description": "Esse é o vídeo 01",
+    "duration": 100
+}
+
+###
+
+DELETE http://localhost:3333/videos/b065aaf3-e7af-446e-8af0-d90e4e71f8a4
