@@ -30,9 +30,31 @@ export class DatabaseMemoryPostgres{
         return users
     }
 
-    async createUser(user){
-        const {firstName, lastName, email, password} = user
-        await sql`INSERT INTO usuario ("firstName", "lastName", "email", "password") VALUES (${firstName}, ${lastName}, ${email}, ${password})`
+    async createUser(user) {
+        const { firstName, lastName, email, password, isNutritionist, crn, photoUrl, phone } = user;
+    
+        // Verificar se o email já está em uso
+        const existingUser = await sql`
+            SELECT 1 FROM usuario WHERE "email" = ${email}
+        `;
+    
+        if (existingUser.length > 0) {
+            throw new Error('Email já está em uso.');
+        }
+    
+        // Inserir os campos dependendo de "isNutritionist"
+        await sql`
+            INSERT INTO usuario (
+                "firstName", "lastName", "email", "password", "isNutritionist", "crn", "photoUrl", "phone"
+            )
+            VALUES (
+                ${firstName}, ${lastName}, ${email}, ${password},
+                ${isNutritionist || false}, 
+                ${isNutritionist ? crn : null},
+                ${isNutritionist ? photoUrl : null},
+                ${isNutritionist ? phone : null}
+            )
+        `;
     }
 
     async listIngredients(){
@@ -102,6 +124,10 @@ export class DatabaseMemoryPostgres{
 
     // update(id, video){
     // }
+    
+    
+    update(id, video){
+    }
 
     // delete(id){
     // }
