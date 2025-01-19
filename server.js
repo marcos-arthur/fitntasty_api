@@ -1,40 +1,56 @@
-// import { createServer } from 'node:http'
-
-// const server = createServer((request, response) =>{
-//     response.write("oi")
-
-//     return response.end()
-// })
-
-// server.listen(3333)
-
-import {fastify} from "fastify";
+import { fastify } from "fastify";
 import fastifyCors from '@fastify/cors';
 import { DatabaseMemoryPostgres } from "./database-postgres.js";
 
-const database = new DatabaseMemoryPostgres()
-const server = fastify()
+const database = new DatabaseMemoryPostgres();
+const server = fastify();
 
 server.register(fastifyCors, {
-    origin: "*", 
+    origin: "*",
 });
 
 server.post('/usuarios', async (request, reply) => {
     reply.header("Access-Control-Allow-Origin", "*");
-    reply.header("Access-Control-Allow-Methods", "POST");
-    const {firstName, lastName, email, password} = request.body
-    
-    console.log(request.body)
+    reply.header("Access-Control-Allow-Methods", "POST");
 
-    await database.createUser({
-        firstName, 
-        lastName, 
-        email, 
-        password
-    })
+    const { firstName, lastName, email, password, isNutritionist, crn, photoUrl, phone } = request.body;
 
-    return reply.status(201).send()
-})
+    try {
+        // Chama a função do banco para criar o usuário
+        await database.createUser({
+            firstName,
+            lastName,
+            email,
+            password,
+            isNutritionist,
+            crn,
+            photoUrl,
+            phone
+        });
+
+        return reply.status(201).send({ message: 'Usuário criado com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao criar usuário:', error);
+
+        if (error.message === 'Email já está em uso.') {
+            return reply.status(400).send({ error: error.message });
+        }
+
+        // Retorna um erro genérico para outros casos
+        return reply.status(500).send({ error: 'Erro interno no servidor.' });
+    }
+});
+
+
+server.listen({
+    port: 3333,
+}, (err, address) => {
+    if (err) {
+        console.error(err);
+        process.exit(1);
+    }
+    console.log(`Server is running on ${address}`);
+});
 
 server.get('/usuarios', async (request, reply) => {
     const search = request.query.search
@@ -79,13 +95,3 @@ server.delete('/videos/:id', async (request, reply) => {
 
     return reply.status(204).send()
 })
-
-server.listen({
-  port: 3333,
-}, (err, address) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-  console.log(`Server is running on ${address}`);
-});
