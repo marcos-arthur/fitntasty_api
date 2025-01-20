@@ -114,3 +114,8 @@ server.delete('/videos/:id', async (request, reply) => {
 
     return reply.status(204).send()
 })
+
+server.get('/nutritionists', async (request, reply) => {
+    const nutritionists = await database.listNutritionists();
+    return nutritionists;
+});

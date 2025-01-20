@@ -55,7 +55,7 @@ export class DatabaseMemoryPostgres{
                 ${isNutritionist ? phone : null}
             )
         `;
-    }
+    }    
 
     async listIngredients(){
         return await sql`SELECT * FROM INGREDIENTS`
@@ -109,6 +109,15 @@ export class DatabaseMemoryPostgres{
             WHERE ri.id_recipe = ${id_recipe}
         `
     }
+
+    async listNutritionists() {
+        return await sql`
+            SELECT "firstName", "lastName", "crn", "photoUrl"
+            FROM "usuario"
+            WHERE "isNutritionist" = true
+        `;
+    }
+    
 
     // update(id, video){
     // }
