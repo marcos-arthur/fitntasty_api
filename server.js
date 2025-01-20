@@ -89,23 +89,27 @@ server.post('/recipes/:id_recipe', async (request, reply) => {
     return recipe
 })
 
-server.post('/recipes', async(request, reply) => {
-    const {title, image, description, ingredients, steps, calories, prepTime} = request.body
-    // console.log(request.body)
+server.post('/recipes', async (request, reply) => {
+    const { title, image, description, ingredients, steps, calories, prepTime } = request.body;
 
-    await database.addRecipe({
-        title, 
-        image, 
-        description, 
-        ingredients, 
-        steps, 
-        calories, 
-        prepTime
-    })
+    try {
+        await database.addRecipe({
+            title, 
+            image, 
+            description, 
+            ingredients, 
+            steps, 
+            calories, 
+            prepTime
+        });
 
+        return reply.status(201).send({ message: 'Receita adicionada com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao adicionar receita:', error);
+        return reply.status(500).send({ error: 'Erro interno no servidor.' });
+    }
+});
 
-    return reply.status(204).send()
-})
 
 server.delete('/videos/:id', async (request, reply) => {
     const videoId = request.params.id

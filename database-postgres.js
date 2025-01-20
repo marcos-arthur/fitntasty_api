@@ -82,24 +82,26 @@ export class DatabaseMemoryPostgres{
         `
     }
 
-    async addRecipe(recipe){
-        const {title, image, description, ingredients, steps, calories, prepTime} = recipe
+    async addRecipe(recipe) {
+        const { title, image, description, ingredients, steps, calories, prepTime } = recipe;
         const recipeId = Array.from(await sql`
-            INSERT INTO RECIPES ("title", "image", "description", "steps", "calories", "prepTime", "id_usuario") 
+            INSERT INTO recipes ("title", "image", "description", "steps", "calories", "prepTime", "id_usuario") 
             VALUES (${title}, ${image}, ${description}, ${steps}, ${calories}, ${prepTime}, 2) 
-            RETURNING id_recipe`)[0].id_recipe
+            RETURNING id_recipe`)[0].id_recipe;
         
-        ingredients.map(async (ingredient) =>{
-            const {nome, unidade_de_medida, qtd} = ingredient
-            let ingredientId = Array.from(await this.getIngredientByName(nome))[0]
+        ingredients.map(async (ingredient) => {
+            const { name, unidade_de_medida, qtd } = ingredient;
+            let ingredientId = Array.from(await this.getIngredientByName(name))[0];
             
-            if(!ingredientId){
-                ingredientId = Array.from(await this.addIngredient(nome))[0].id_ingredient
+            if (!ingredientId) {
+                ingredientId = Array.from(await this.addIngredient(name))[0].id_ingredient;
             }
             
-            await sql`INSERT INTO RECIPE_INGREDIENTS ("id_recipe", "id_ingredient", "quantity", "measure_unity") VALUES (${recipeId}, ${ingredientId}, ${qtd}, ${unidade_de_medida})`
-        })
+            await sql`INSERT INTO recipe_ingredients ("id_recipe", "id_ingredient", "quantity", "measure_unity") VALUES (${recipeId}, ${ingredientId}, ${qtd}, ${unidade_de_medida})`;
+        });
     }
+    
+    
 
     async getIngredientByRecipeId(id_recipe){
         return await sql`
@@ -112,12 +114,12 @@ export class DatabaseMemoryPostgres{
 
     async listNutritionists() {
         return await sql`
-            SELECT "firstName", "lastName", "crn", "photoUrl"
+            SELECT "firstName", "lastName", "crn", "photoUrl", "email", "phone"
             FROM "usuario"
             WHERE "isNutritionist" = true
         `;
     }
-    
+     
 
     // update(id, video){
     // }
