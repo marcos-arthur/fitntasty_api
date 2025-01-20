@@ -78,16 +78,29 @@ server.get('/recipes', async (request, reply) => {
     return recipes
 })
 
-server.post('/recipes/:id_recipe', async (request, reply) => {
-    const recipe = Array.from(await database.getRecipeById(request.params.id_recipe))[0]
-    
-    if(recipe){
-        const ingredients = Array.from(await database.getIngredientByRecipeId(recipe.id_recipe))
-        recipe.ingredients = ingredients
-    }
+server.get('/recipes/:id_recipe', async (request, reply) => {
+    const { id_recipe } = request.params;
 
-    return recipe
-})
+    try {
+        const recipe = Array.from(await database.getRecipeById(id_recipe))[0];
+
+        if (recipe) {
+            const ingredients = Array.from(
+                await database.getIngredientByRecipeId(recipe.id_recipe)
+            );
+            recipe.ingredients = ingredients;
+            return reply.status(200).send(recipe);
+        } else {
+            return reply.status(404).send({ error: 'Receita não encontrada.' });
+        }
+    } catch (error) {
+        console.error(error);
+        return reply.status(500).send({ error: 'Erro interno no servidor.' });
+    }
+});
+
+
+
 
 server.post('/recipes', async (request, reply) => {
     const { title, image, description, ingredients, steps, calories, prepTime } = request.body;

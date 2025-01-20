@@ -84,7 +84,7 @@ export class DatabaseMemoryPostgres{
 
     async addRecipe(recipe) {
         const { title, image, description, ingredients, steps, calories, prepTime } = recipe;
-        const recipeId = Array.from(await sql`
+        const id_recipeId = Array.from(await sql`
             INSERT INTO recipes ("title", "image", "description", "steps", "calories", "prepTime", "id_usuario") 
             VALUES (${title}, ${image}, ${description}, ${steps}, ${calories}, ${prepTime}, 2) 
             RETURNING id_recipe`)[0].id_recipe;
