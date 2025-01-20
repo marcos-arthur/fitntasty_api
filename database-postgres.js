@@ -71,7 +71,7 @@ export class DatabaseMemoryPostgres{
                 ${isNutritionist ? phone : null}
             )
         `;
-    }
+    }    
 
     async listIngredients(){
         return await sql`SELECT * FROM INGREDIENTS`
@@ -107,36 +107,36 @@ export class DatabaseMemoryPostgres{
         `
     }
 
-    async getRecipeByIngredient(ingredient){
-        return await sql`
-            SELECT r."id_recipe", "title", "image", "calories", "prepTime" 
-            FROM RECIPES r
-            INNER JOIN RECIPE_INGREDIENTS ri ON r.id_recipe = ri.id_recipe
-            INNER JOIN INGREDIENTS i ON i.id_ingredient = ri.id_ingredient AND i.name = ${ingredient}
-        `
-    }
-
-    async addRecipe(recipe){
-        const {title, image, description, ingredients, steps, calories, prepTime} = recipe
-        const recipeId = Array.from(await sql`
-            INSERT INTO RECIPES ("title", "image", "description", "steps", "calories", "prepTime", "id_usuario") 
+    async addRecipe(recipe) {
+        const { title, image, description, ingredients, steps, calories, prepTime } = recipe;
+        const id_recipeId = Array.from(await sql`
+            INSERT INTO recipes ("title", "image", "description", "steps", "calories", "prepTime", "id_usuario") 
             VALUES (${title}, ${image}, ${description}, ${steps}, ${calories}, ${prepTime}, 2) 
-            RETURNING id_recipe`)[0].id_recipe
+            RETURNING id_recipe`)[0].id_recipe;
         
-        ingredients.map(async (ingredient) =>{
-            const {nome, unidade_de_medida, qtd} = ingredient
-            let ingredientId = Array.from(await this.getIngredientByName(nome))[0]?.id_ingredient
-            console.log(ingredientId)
+        ingredients.map(async (ingredient) => {
+            const { name, unidade_de_medida, qtd } = ingredient;
+            let ingredientId = Array.from(await this.getIngredientByName(name))[0];
+  
             
-            if(!ingredientId){
-                ingredientId = Array.from(await this.addIngredient(nome))[0].id_ingredient
+            if (!ingredientId) {
+                ingredientId = Array.from(await this.addIngredient(name))[0].id_ingredient;
             }
             
-            await sql`INSERT INTO RECIPE_INGREDIENTS ("id_recipe", "id_ingredient", "quantity", "measure_unity") VALUES (${recipeId}, ${ingredientId}, ${qtd}, ${unidade_de_medida})`
-        })
+            await sql`INSERT INTO recipe_ingredients ("id_recipe", "id_ingredient", "quantity", "measure_unity") VALUES (${recipeId}, ${ingredientId}, ${qtd}, ${unidade_de_medida})`;
+        });
     }
-
     
+    
+
+    async listNutritionists() {
+        return await sql`
+            SELECT "firstName", "lastName", "crn", "photoUrl", "email", "phone"
+            FROM "usuario"
+            WHERE "isNutritionist" = true
+        `;
+    }
+     
 
     // update(id, video){
     // }
