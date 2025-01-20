@@ -7,7 +7,7 @@ export class DatabaseMemoryPostgres{
         console.log(userData);
     
         const user = await sql`
-            SELECT "id_usuario", "email", "firstName", "lastName", "id_tipousuario"
+            SELECT "id_usuario", "email", "firstName", "lastName", "isNutritionist"
             FROM "usuario"
             WHERE "email" = ${email} AND "password" = ${password}
         `.catch(error => {
@@ -109,14 +109,14 @@ export class DatabaseMemoryPostgres{
 
     async addRecipe(recipe) {
         const { title, image, description, ingredients, steps, calories, prepTime } = recipe;
-        const id_recipeId = Array.from(await sql`
+        const recipeId = Array.from(await sql`
             INSERT INTO recipes ("title", "image", "description", "steps", "calories", "prepTime", "id_usuario") 
             VALUES (${title}, ${image}, ${description}, ${steps}, ${calories}, ${prepTime}, 2) 
             RETURNING id_recipe`)[0].id_recipe;
         
         ingredients.map(async (ingredient) => {
             const { name, unidade_de_medida, qtd } = ingredient;
-            let ingredientId = Array.from(await this.getIngredientByName(name))[0];
+            let ingredientId = Array.from(await this.getIngredientByName(name))[0]?.id_ingredient
   
             
             if (!ingredientId) {
